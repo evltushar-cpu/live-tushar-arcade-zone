@@ -1,0 +1,2334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#050510">
+<title>🕹️ TUSHAR'S RETRO ARCADE</title>
+<style>
+/* ═══════════════════════════════════════════════
+   100% STANDALONE RETRO ARCADE PORTAL
+   ALL GAMES INJECTED DIRECTLY INSIDE THIS FILE
+   CREATED & OWNED BY TUSHAR
+═══════════════════════════════════════════════ */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+:root {
+  --neon-green:  #00ff41;
+  --neon-pink:   #ff0090;
+  --neon-blue:   #00d4ff;
+  --neon-yellow: #ffff00;
+  --neon-orange: #ff8800;
+  --dark-bg:     #050510;
+  --crt-dark:    #0a0a1a;
+  --ctrl-bottom-portrait: clamp(130px, 18vh, 200px);
+  --ctrl-bottom-landscape: clamp(70px, 18vh, 130px);
+  --pills-bottom-portrait: clamp(40px, 7vh, 80px);
+  --pills-bottom-landscape: 24px;
+}
+
+* {
+  margin: 0; padding: 0; box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  font-family: 'Press Start 2P', 'Courier New', monospace;
+}
+
+html, body {
+  width: 100vw; height: 100vh;
+  overflow: hidden;
+  background: var(--dark-bg);
+  color: var(--neon-green);
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* CRT Scanlines */
+#crt-scanlines {
+  position: fixed; inset: 0;
+  background: repeating-linear-gradient(0deg,
+    transparent, transparent 2px,
+    rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px);
+  pointer-events: none; z-index: 9997;
+}
+
+/* CRT Vignette */
+#crt-vignette {
+  position: fixed; inset: 0;
+  background: radial-gradient(ellipse at center,
+    transparent 55%, rgba(0,0,0,0.7) 100%);
+  pointer-events: none; z-index: 9996;
+}
+
+/* Keyframes */
+@keyframes titleGlow {
+  0%, 100% { text-shadow: 0 0 8px #ffff00, 0 0 20px #ffff00, 0 0 40px #ff8800; }
+  50% { text-shadow: 0 0 16px #ffff00, 0 0 35px #ff8800, 0 0 70px #ff4400; }
+}
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+@keyframes marqueeAnim {
+  from { transform: translateX(100vw); }
+  to { transform: translateX(-100%); }
+}
+
+/* ═══════════════════════════════════════
+   ARCADE MAIN MENU
+═══════════════════════════════════════ */
+#arcade-menu {
+  position: fixed; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center;
+  background: var(--dark-bg);
+  overflow-y: auto;
+  z-index: 100;
+  padding-bottom: 30px;
+}
+
+.arcade-header {
+  width: 100%; text-align: center;
+  padding: 24px 12px 10px;
+  background: linear-gradient(180deg, rgba(0,255,0,0.12), transparent);
+  border-bottom: 1px solid rgba(0,255,65,0.3);
+}
+
+.arcade-logo {
+  font-size: clamp(12px, 3.8vw, 24px);
+  color: var(--neon-yellow);
+  animation: titleGlow 1.6s infinite;
+  letter-spacing: 1px;
+  line-height: 1.6;
+}
+
+.arcade-sub {
+  font-size: clamp(5px, 1.6vw, 8px);
+  color: var(--neon-pink);
+  animation: blink 1s step-end infinite;
+  margin-top: 6px;
+}
+
+/* ═══════════════════════════════════════
+   STOCK MARKET LIVE TICKER (SEAMLESS CONTINUOUS LOOP)
+═══════════════════════════════════════ */
+.stock-ticker-band {
+  width: 100%;
+  flex-shrink: 0;
+  height: 34px;
+  min-height: 34px;
+  background: #080816;
+  border-top: 1.5px solid var(--neon-green);
+  border-bottom: 1.5px solid var(--neon-green);
+  box-shadow: 0 0 14px rgba(0, 255, 65, 0.22), inset 0 0 10px rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  margin: 8px 0;
+}
+
+.ticker-live-tag {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(255, 34, 68, 0.22);
+  border-right: 1.5px solid #ff2244;
+  color: #ff2244;
+  font-size: 7px;
+  font-weight: bold;
+  padding: 0 10px;
+  height: 100%;
+  flex-shrink: 0;
+  z-index: 5;
+  letter-spacing: 1px;
+}
+
+.live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ff2244;
+  box-shadow: 0 0 8px #ff2244;
+  animation: blink 0.8s step-end infinite;
+}
+
+.ticker-viewport {
+  display: flex;
+  overflow: hidden;
+  flex: 1;
+  position: relative;
+  mask-image: linear-gradient(90deg, transparent 0%, #000 15px, #000 calc(100% - 15px), transparent 100%);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 15px, #000 calc(100% - 15px), transparent 100%);
+}
+
+.ticker-track {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 16px;
+  padding-right: 16px;
+  will-change: transform;
+  animation: stockTickerLoop 25s linear infinite;
+}
+
+@keyframes stockTickerLoop {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
+}
+
+.ticker-item {
+  font-size: clamp(6px, 1.8vw, 8px);
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  letter-spacing: 0.5px;
+}
+.ticker-sym {
+  font-weight: bold;
+  padding: 2px 4px;
+  border-radius: 2px;
+  font-size: clamp(5px, 1.5vw, 7px);
+}
+.ticker-item.green  { color: #00ff41; }
+.ticker-item.green  .ticker-sym { background: rgba(0,255,65,0.2); color: #00ff41; }
+.ticker-item.yellow { color: #ffff00; }
+.ticker-item.yellow .ticker-sym { background: rgba(255,255,0,0.2); color: #ffff00; }
+.ticker-item.cyan   { color: #00d4ff; }
+.ticker-item.cyan   .ticker-sym { background: rgba(0,212,255,0.2); color: #00d4ff; }
+.ticker-item.pink   { color: #ff0090; }
+.ticker-item.pink   .ticker-sym { background: rgba(255,0,144,0.2); color: #ff0090; }
+.ticker-item.gold   { color: #ffdd00; }
+.ticker-item.gold   .ticker-sym { background: rgba(255,221,0,0.2); color: #ffdd00; }
+.ticker-item.orange { color: #ff8800; }
+.ticker-item.orange .ticker-sym { background: rgba(255,136,0,0.2); color: #ff8800; }
+.ticker-item.blue   { color: #3399ff; }
+.ticker-item.blue   .ticker-sym { background: rgba(51,153,255,0.2); color: #3399ff; }
+
+.ticker-sep {
+  color: #333355;
+  font-size: 9px;
+}
+
+/* BANNER */
+.status-banner {
+  width: 100%; max-width: 740px;
+  background: rgba(0,255,65,0.08);
+  border: 1px solid var(--neon-green);
+  border-radius: 4px;
+  padding: 12px 14px;
+  margin: 6px auto;
+  font-size: clamp(5px, 1.5vw, 7px);
+  color: var(--neon-green);
+  line-height: 2.2;
+}
+.status-banner strong { color: var(--neon-yellow); }
+
+/* SECTION TITLE */
+.section-title {
+  width: 100%; max-width: 740px;
+  font-size: clamp(6px, 1.8vw, 9px);
+  color: var(--neon-yellow);
+  text-shadow: 0 0 8px var(--neon-yellow);
+  padding: 8px 10px 4px;
+  border-left: 3px solid var(--neon-yellow);
+  margin: 8px auto 6px;
+}
+
+/* GAMES GRID */
+.games-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 14px;
+  width: 100%; max-width: 760px;
+  padding: 6px 10px;
+}
+
+.game-card {
+  border: 2px solid var(--neon-green);
+  border-radius: 8px; padding: 10px;
+  cursor: pointer; text-align: center;
+  background: rgba(12, 12, 28, 0.85);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+  position: relative; overflow: hidden;
+  display: flex; flex-direction: column;
+  justify-content: space-between;
+}
+.game-card:active {
+  transform: scale(0.97);
+  box-shadow: 0 0 24px currentColor;
+}
+
+.game-card.aladdin { border-color: #ffaa00; color: #ffaa00; }
+.game-card.aladdin:hover, .game-card.aladdin:active { background: rgba(255,170,0,0.18); box-shadow: 0 0 20px rgba(255,170,0,0.5); }
+
+.game-card.umk3 { border-color: #bb00ff; color: #bb00ff; }
+.game-card.umk3:hover, .game-card.umk3:active { background: rgba(187,0,255,0.18); box-shadow: 0 0 20px rgba(187,0,255,0.5); }
+
+.game-card.sf5 { border-color: #ff0055; color: #ff0055; }
+.game-card.sf5:hover, .game-card.sf5:active { background: rgba(255,0,85,0.18); box-shadow: 0 0 20px rgba(255,0,85,0.5); }
+
+.game-card.contra4 { border-color: #00ffaa; color: #00ffaa; }
+.game-card.contra4:hover, .game-card.contra4:active { background: rgba(0,255,170,0.18); box-shadow: 0 0 20px rgba(0,255,170,0.5); }
+
+.game-card.contra-force { border-color: #ffcc00; color: #ffcc00; }
+.game-card.contra-force:hover, .game-card.contra-force:active { background: rgba(255,204,0,0.18); box-shadow: 0 0 20px rgba(255,204,0,0.5); }
+
+.game-card.mario-nds { border-color: #ff2222; color: #ff2222; }
+.game-card.mario-nds:hover, .game-card.mario-nds:active { background: rgba(255,34,34,0.18); box-shadow: 0 0 20px rgba(255,34,34,0.5); }
+
+.game-card.mario-classic { border-color: #ff8800; color: #ff8800; }
+.game-card.mario-classic:hover, .game-card.mario-classic:active { background: rgba(255,136,0,0.18); box-shadow: 0 0 20px rgba(255,136,0,0.5); }
+
+.game-card.custom { border-color: var(--neon-blue); color: var(--neon-blue); }
+.game-card.custom:hover, .game-card.custom:active { background: rgba(0,212,255,0.18); box-shadow: 0 0 20px rgba(0,212,255,0.5); }
+
+.card-cover-wrap {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  border-radius: 6px;
+  overflow: hidden;
+  position: relative;
+  background: #060614;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  margin-bottom: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.7);
+}
+
+.card-cover-wrap::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.03) 40%, transparent 60%),
+              repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.12) 3px, rgba(0,0,0,0.12) 4px);
+  pointer-events: none;
+  border-radius: 6px;
+}
+
+.game-cover-art {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+}
+
+.cover-badge {
+  position: absolute;
+  top: 6px; right: 6px;
+  font-size: 6px;
+  font-family: 'Press Start 2P', monospace;
+  padding: 3px 5px;
+  border-radius: 3px;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.9);
+}
+.cover-badge.gold { background: #ffaa00; color: #000; }
+.cover-badge.red { background: #ff2222; color: #fff; }
+.cover-badge.orange { background: #ff8800; color: #000; }
+.cover-badge.blue { background: #00d4ff; color: #000; }
+.cover-badge.purple { background: #aa00ff; color: #fff; }
+.cover-badge.teal { background: #00ffaa; color: #000; }
+.cover-badge.yellow { background: #ffff00; color: #000; }
+
+.card-name { font-size: clamp(7px, 2vw, 9px); color: #fff; margin-bottom: 4px; line-height: 1.4; }
+.card-desc { font-size: clamp(5px, 1.3vw, 6px); color: #aaa; margin-bottom: 8px; line-height: 1.6; }
+.card-badge {
+  display: inline-block; font-size: 6px; padding: 4px 6px;
+  border-radius: 3px; background: #00aa00; color: #fff;
+  letter-spacing: 0.5px;
+}
+.card-badge.gold { background: #ffdd00; color: #000; }
+
+/* ACTION BAR */
+.action-bar {
+  width: 100%; max-width: 740px;
+  display: flex; justify-content: center;
+  gap: 10px; flex-wrap: wrap;
+  padding: 8px; margin-top: 6px;
+}
+.arcade-btn {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(6px, 1.8vw, 8px);
+  padding: 10px 14px; cursor: pointer;
+  border-radius: 4px; transition: all 0.2s;
+  background: rgba(170,0,255,0.15);
+  border: 1px solid #aa00ff; color: #dd88ff;
+  box-shadow: 0 0 10px rgba(170,0,255,0.3);
+}
+.arcade-btn:active { transform: scale(0.96); filter: brightness(1.3); }
+
+/* ═══ OWNER PLAQUE ═══ */
+.owner-panel {
+  width: 100%; max-width: 740px;
+  padding: 8px; margin-top: 14px;
+}
+.owner-inner {
+  border: 2px solid #ffdd00;
+  background: linear-gradient(135deg, #0a0500, #1a0f00, #0a0500);
+  padding: 18px 10px; text-align: center;
+  position: relative; overflow: hidden;
+  border-radius: 4px;
+}
+.oc-star {
+  position: absolute; font-size: 11px; color: #ffdd00;
+  animation: blink 0.7s step-end infinite;
+}
+.oc-star:nth-child(1) { top: 6px; left: 8px; }
+.oc-star:nth-child(2) { top: 6px; right: 8px; animation-delay: 0.35s; }
+.oc-star:nth-child(3) { bottom: 6px; left: 8px; animation-delay: 0.15s; }
+.oc-star:nth-child(4) { bottom: 6px; right: 8px; animation-delay: 0.5s; }
+.oc-divider { font-size: clamp(5px, 1.3vw, 7px); color: #ff8800; letter-spacing: 4px; margin-bottom: 6px; }
+.oc-label { font-size: clamp(5px, 1.5vw, 7px); color: #777; letter-spacing: 3px; margin-bottom: 6px; }
+.oc-name {
+  font-size: clamp(16px, 5.5vw, 26px);
+  background: linear-gradient(90deg, #ff8800, #ffdd00, #ff4400, #ffdd00, #ff8800);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 5px;
+  animation: titleGlow 2s infinite;
+  margin: 6px 0;
+}
+.oc-rank { font-size: clamp(5px, 1.5vw, 7px); color: #ffdd00; letter-spacing: 3px; margin: 6px 0; }
+.oc-badges { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin: 8px 0; }
+.oc-badge { font-size: clamp(5px, 1.3vw, 6px); padding: 2px 7px; border-radius: 1px; }
+.oc-badge.green { color: var(--neon-green); border: 1px solid var(--neon-green); }
+.oc-badge.blue { color: var(--neon-blue); border: 1px solid var(--neon-blue); }
+.oc-badge.pink { color: var(--neon-pink); border: 1px solid var(--neon-pink); }
+.oc-badge.gold { color: #ffdd00; border: 1px solid #ffdd00; }
+.oc-copy { font-size: clamp(5px, 1.4vw, 7px); color: var(--neon-pink); margin-top: 6px; animation: blink 1s step-end infinite; }
+
+/* ═══════════════════════════════════════
+   EMULATOR ACTIVE SCREEN & FULLSCREEN
+═══════════════════════════════════════ */
+#emu-screen {
+  display: none; position: fixed; inset: 0;
+  background: #000; z-index: 200;
+  flex-direction: column; overflow: hidden;
+  width: 100vw; height: 100vh;
+}
+#emu-screen.active { display: flex; }
+
+/* CSS FORCED 90° LANDSCAPE ROTATION */
+#emu-screen.force-landscape {
+  position: fixed !important;
+  top: 0 !important; left: 0 !important;
+  width: 100vh !important;
+  height: 100vw !important;
+  transform: rotate(90deg) translateY(-100vw) !important;
+  transform-origin: top left !important;
+  z-index: 9999 !important;
+}
+
+#emu-topbar {
+  width: 100%; height: 38px;
+  background: rgba(8, 8, 20, 0.95);
+  border-bottom: 1px solid var(--neon-green);
+  display: flex; align-items: center;
+  justify-content: space-between;
+  padding: 0 8px; flex-shrink: 0;
+  z-index: 100000;
+}
+.emu-title-text {
+  font-size: clamp(5px, 1.4vw, 7px);
+  color: var(--neon-green);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  max-width: 32%;
+}
+.topbar-actions {
+  display: flex; align-items: center; gap: 4px;
+}
+.topbar-btn {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(4px, 1.2vw, 6px);
+  background: rgba(0,255,65,0.12);
+  border: 1px solid var(--neon-green);
+  color: var(--neon-green);
+  padding: 5px 7px; cursor: pointer;
+  border-radius: 3px; white-space: nowrap;
+  touch-action: manipulation;
+}
+.topbar-btn.orient-toggle {
+  border-color: var(--neon-blue);
+  color: var(--neon-blue);
+  background: rgba(0,212,255,0.2);
+}
+.topbar-btn.ctrl-toggle {
+  border-color: var(--neon-yellow);
+  color: var(--neon-yellow);
+  background: rgba(255,255,0,0.15);
+}
+.topbar-btn.mode-toggle {
+  border-color: var(--neon-green);
+  color: var(--neon-green);
+  background: rgba(0, 255, 65, 0.15);
+  font-weight: bold;
+}
+.topbar-btn.mode-toggle.pc-mode-active {
+  border-color: var(--neon-blue);
+  color: var(--neon-blue);
+  background: rgba(0, 212, 255, 0.28);
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+}
+.topbar-btn.pos-toggle {
+  border-color: var(--neon-orange);
+  color: var(--neon-orange);
+  background: rgba(255,136,0,0.2);
+}
+.topbar-btn.sfx-toggle {
+  border-color: var(--neon-pink);
+  color: var(--neon-pink);
+  background: rgba(255,0,144,0.2);
+}
+
+/* KEYBOARD LEGEND FOR PC PLAY */
+#keyboard-legend {
+  position: absolute;
+  bottom: 12px; left: 50%;
+  transform: translateX(-50%);
+  display: none;
+  align-items: center;
+  gap: 7px;
+  background: rgba(8, 8, 20, 0.92);
+  border: 1px solid var(--neon-blue);
+  box-shadow: 0 0 16px rgba(0, 212, 255, 0.4);
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: clamp(4.5px, 1.1vw, 6.5px);
+  color: #ddddff;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 100000;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.kl-tag { color: var(--neon-yellow); font-weight: bold; }
+.kl-k {
+  color: var(--neon-green);
+  border: 1px solid rgba(0,255,65,0.4);
+  padding: 1px 4px;
+  border-radius: 2px;
+  background: rgba(0,255,65,0.12);
+  font-weight: bold;
+}
+.kl-sep { color: #555577; }
+.topbar-btn.exit {
+  border-color: #ff3333; color: #ff3333; background: rgba(255,51,51,0.15);
+}
+.topbar-btn:active { filter: brightness(1.4); }
+
+#game-container {
+  width: 100%; flex: 1;
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
+  background: #000;
+  overflow: hidden;
+  min-height: 0;
+}
+
+#game-target {
+  width: 100%; height: 100%;
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* Force EmulatorJS canvas to maximize and stay crisp */
+.ejs_canvas_parent {
+  width: 100% !important;
+  height: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  position: absolute !important;
+  inset: 0 !important;
+  background: #000 !important;
+}
+
+canvas.ejs_canvas {
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: contain !important;
+  margin: auto !important;
+  display: block !important;
+  image-rendering: pixelated !important;
+  image-rendering: crisp-edges !important;
+}
+
+/* HARD DISMISS: Hide intrusive EmulatorJS built-in menus AND internal virtual gamepad */
+.ejs_menu_bar, .ejs_context_menu,
+#ejs_gamepad, .ejs_virtual_gamepad, [id*="virtual_gamepad"], [class*="virtualGamepad"], [class*="ejs_gamepad"] {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  opacity: 0 !important;
+}
+
+/* ═══════════════════════════════════════
+   ARCADE LOADER CARD (NON-BLOCKING)
+═══════════════════════════════════════ */
+#arcade-loader {
+  position: absolute;
+  top: 38px; left: 0; right: 0; bottom: 0;
+  background: rgba(3, 3, 10, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50000;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.loader-card {
+  background: rgba(12, 12, 28, 0.95);
+  border: 2px solid var(--neon-green);
+  border-radius: 8px;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 0 35px rgba(0, 255, 65, 0.35);
+  pointer-events: auto;
+  max-width: 330px;
+  text-align: center;
+}
+
+.loader-spinner {
+  width: 44px;
+  height: 44px;
+  border: 3.5px solid rgba(0, 255, 65, 0.2);
+  border-top: 3.5px solid var(--neon-green);
+  border-right: 3.5px solid var(--neon-yellow);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 14px;
+}
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+.loader-title {
+  font-size: clamp(8px, 2.5vw, 12px);
+  color: var(--neon-yellow);
+  letter-spacing: 1.5px;
+  animation: titleGlow 1.5s infinite;
+  margin-bottom: 8px;
+}
+
+.loader-status {
+  font-size: clamp(5px, 1.6vw, 7px);
+  color: var(--neon-green);
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+
+.loader-bar-track {
+  width: 220px;
+  max-width: 85%;
+  height: 8px;
+  background: #111122;
+  border: 1px solid var(--neon-green);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.loader-bar-fill {
+  width: 25%;
+  height: 100%;
+  background: linear-gradient(90deg, var(--neon-green), var(--neon-yellow));
+  box-shadow: 0 0 10px var(--neon-green);
+  transition: width 0.3s ease;
+}
+
+.loader-note {
+  font-size: clamp(4.5px, 1.4vw, 6px);
+  color: #8888aa;
+  line-height: 1.8;
+  max-width: 280px;
+}
+
+#loader-error-box {
+  margin-top: 10px;
+  background: rgba(255, 51, 51, 0.15);
+  border: 1px solid #ff3333;
+  padding: 10px;
+  border-radius: 4px;
+  max-width: 300px;
+}
+.loader-err-msg {
+  font-size: clamp(5px, 1.4vw, 6px);
+  color: #ff6666;
+  line-height: 1.8;
+  margin-bottom: 8px;
+}
+.loader-retry-btn {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 6px;
+  padding: 6px 10px;
+  background: #ff3333;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  border-radius: 3px;
+  margin: 3px;
+}
+
+/* ═══════════════════════════════════════
+   ULTRA-RESPONSIVE FLOATING HUD CONTROLLER
+   ALWAYS HIGHEST Z-INDEX (99999)
+═══════════════════════════════════════ */
+#virtual-controller {
+  position: absolute;
+  top: 38px; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+  z-index: 99999;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  transition: opacity 0.2s ease;
+}
+
+/* SHOULDER BUMPERS (L & R) */
+.shoulder-row {
+  position: absolute;
+  top: 12px; left: 16px; right: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  pointer-events: none;
+}
+
+.shoulder-btn {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 11px;
+  font-weight: bold;
+  padding: 10px 20px;
+  cursor: pointer;
+  pointer-events: auto !important;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  transition: transform 0.05s, filter 0.05s;
+}
+.btn-L {
+  background: rgba(0, 212, 255, 0.28);
+  border: 2px solid #00d4ff;
+  color: #00d4ff;
+  border-radius: 16px 4px 4px 16px;
+  box-shadow: 0 0 12px rgba(0,212,255,0.4);
+}
+.btn-R {
+  background: rgba(255, 0, 144, 0.28);
+  border: 2px solid #ff0090;
+  color: #ff0090;
+  border-radius: 4px 16px 16px 4px;
+  box-shadow: 0 0 12px rgba(255,0,144,0.4);
+}
+.shoulder-btn:active, .shoulder-btn.pressed {
+  filter: brightness(2.2);
+  transform: scale(0.92);
+  box-shadow: 0 0 20px currentColor;
+}
+
+/* SELECT & START PILLS */
+.mid-pills {
+  position: absolute;
+  bottom: var(--pills-bottom-portrait); left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  pointer-events: auto !important;
+  z-index: 100001;
+}
+.pill-btn {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  padding: 8px 14px;
+  border-radius: 14px;
+  background: rgba(18, 18, 34, 0.88);
+  border: 1.5px solid #8888aa;
+  color: #dddddd;
+  cursor: pointer;
+  letter-spacing: 1px;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  box-shadow: 0 3px 10px rgba(0,0,0,0.7);
+}
+.pill-btn:active, .pill-btn.pressed {
+  background: rgba(255, 255, 0, 0.45);
+  border-color: var(--neon-yellow);
+  color: var(--neon-yellow);
+  box-shadow: 0 0 16px var(--neon-yellow);
+}
+
+/* 8-WAY ERGONOMIC D-PAD */
+.dpad-zone {
+  position: absolute;
+  bottom: var(--ctrl-bottom-portrait); left: 20px;
+  width: 164px; height: 164px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto !important;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.dpad-cross {
+  position: relative;
+  width: 146px; height: 146px;
+}
+.dp-arm {
+  position: absolute;
+  background: rgba(14, 14, 28, 0.88);
+  border: 2px solid rgba(0, 255, 65, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--neon-green);
+  font-size: 19px;
+  cursor: pointer;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow: 0 0 10px rgba(0,255,65,0.25);
+  transition: background 0.05s, box-shadow 0.05s;
+}
+.dp-arm span { pointer-events: none; }
+
+.dp-up {
+  top: 0; left: 51px; width: 44px; height: 52px;
+  border-radius: 10px 10px 0 0;
+  border-bottom: none;
+}
+.dp-down {
+  bottom: 0; left: 51px; width: 44px; height: 52px;
+  border-radius: 0 0 10px 10px;
+  border-top: none;
+}
+.dp-left {
+  left: 0; top: 51px; width: 52px; height: 44px;
+  border-radius: 10px 0 0 10px;
+  border-right: none;
+}
+.dp-right {
+  right: 0; top: 51px; width: 52px; height: 44px;
+  border-radius: 0 10px 10px 0;
+  border-left: none;
+}
+.dp-center {
+  position: absolute;
+  top: 51px; left: 51px;
+  width: 44px; height: 44px;
+  background: rgba(14, 14, 28, 0.88);
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.dp-center::after {
+  content: '';
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #050510 40%, rgba(0,255,65,0.4) 100%);
+  border: 1px solid rgba(0,255,65,0.5);
+}
+.dp-arm:active, .dp-arm.pressed {
+  background: rgba(0, 255, 65, 0.65) !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 20px var(--neon-green), inset 0 0 10px #ffffff;
+}
+
+/* 4-WAY SNES ACTION DIAMOND (X, Y, A, B) */
+.abxy-zone {
+  position: absolute;
+  bottom: var(--ctrl-bottom-portrait); right: 20px;
+  width: 164px; height: 164px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto !important;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.abxy-diamond {
+  position: relative;
+  width: 146px; height: 146px;
+}
+.act-btn {
+  position: absolute;
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+  pointer-events: auto !important;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.8), inset 0 2px 4px rgba(255,255,255,0.3);
+  transition: transform 0.05s, filter 0.05s;
+}
+.btn-X {
+  top: 0; left: 49px;
+  background: radial-gradient(circle at 35% 35%, rgba(0,212,255,0.5), rgba(0,20,35,0.9));
+  border: 2px solid #00d4ff;
+  color: #00d4ff;
+}
+.btn-Y {
+  left: 0; top: 49px;
+  background: radial-gradient(circle at 35% 35%, rgba(255,221,0,0.5), rgba(35,30,0,0.9));
+  border: 2px solid #ffdd00;
+  color: #ffdd00;
+}
+.btn-B {
+  bottom: 0; left: 49px;
+  background: radial-gradient(circle at 35% 35%, rgba(255,34,68,0.5), rgba(35,0,10,0.9));
+  border: 2px solid #ff2244;
+  color: #ff2244;
+}
+.btn-A {
+  right: 0; top: 49px;
+  background: radial-gradient(circle at 35% 35%, rgba(0,255,65,0.5), rgba(0,35,12,0.9));
+  border: 2px solid #00ff41;
+  color: #00ff41;
+}
+.act-btn:active, .act-btn.pressed {
+  transform: scale(0.92);
+  filter: brightness(2.4);
+  box-shadow: 0 0 22px currentColor, inset 0 0 14px currentColor;
+}
+
+/* LANDSCAPE VIEWPORT ADJUSTMENTS */
+@media (orientation: landscape) {
+  .dpad-zone {
+    bottom: var(--ctrl-bottom-landscape); left: 32px;
+  }
+  .abxy-zone {
+    bottom: var(--ctrl-bottom-landscape); right: 32px;
+  }
+  .mid-pills {
+    bottom: var(--pills-bottom-landscape);
+  }
+  .shoulder-row {
+    top: 14px; left: 32px; right: 32px;
+  }
+}
+#emu-screen.force-landscape .dpad-zone {
+  bottom: var(--ctrl-bottom-landscape) !important; left: 32px !important;
+}
+#emu-screen.force-landscape .abxy-zone {
+  bottom: var(--ctrl-bottom-landscape) !important; right: 32px !important;
+}
+#emu-screen.force-landscape .mid-pills {
+  bottom: var(--pills-bottom-landscape) !important;
+}
+#emu-screen.force-landscape .shoulder-row {
+  top: 14px !important; left: 32px !important; right: 32px !important;
+}
+
+#hidden-file-input { display: none; }
+</style>
+</head>
+<body>
+
+<div id="crt-scanlines"></div>
+<div id="crt-vignette"></div>
+
+<!-- ═══════════════════════════════════════
+     ARCADE MAIN MENU
+═══════════════════════════════════════ -->
+<div id="arcade-menu">
+  <div class="arcade-header">
+    <div class="arcade-logo">🕹️ TUSHAR'S RETRO ARCADE</div>
+    <div class="arcade-sub">► MULTI-PLATFORM RETRO ARCADE · GITHUB PAGES & PC READY ◄</div>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+       STOCK MARKET LIVE TICKER (SEAMLESS CONTINUOUS LOOP)
+  ═══════════════════════════════════════ -->
+  <div class="stock-ticker-band">
+    <div class="ticker-live-tag">
+      <span class="live-dot"></span>LIVE
+    </div>
+    <div class="ticker-viewport">
+      <div class="ticker-track">
+        <span class="ticker-item green"><span class="ticker-sym">▲ PLAY</span> FAV GAMES</span>
+        <span class="ticker-sep">│</span>
+        <span class="ticker-item yellow"><span class="ticker-sym">● 0</span> DOWNLOAD REQUIRED</span>
+        <span class="ticker-sep">│</span>
+        <span class="ticker-item cyan"><span class="ticker-sym">◆ 100%</span> BROWSER OFFLINE</span>
+        <span class="ticker-sep">│</span>
+        <span class="ticker-item pink"><span class="ticker-sym">▲ ZERO</span> INPUT LAG (0ms)</span>
+        <span class="ticker-sep">│</span>
+        <span class="ticker-item gold"><span class="ticker-sym">★ ALADDIN</span> SNES +100%</span>
+        <span class="ticker-sep">│</span>
+        <span class="ticker-item green"><span class="ticker-sym">▲ NEW SUPER</span> MARIO BROS NDS</span>
+        <span class="ticker-sep">│</span>
+        <span class="ticker-item orange"><span class="ticker-sym">★ SUPER MARIO</span> 1:1 CLASSIC</span>
+        <span class="ticker-sep">│</span>
+        <span class="ticker-item blue"><span class="ticker-sym">🔄 1-TAP</span> LANDSCAPE FULLSCREEN</span>
+        <span class="ticker-sep">│</span>
+        <span class="ticker-item gold"><span class="ticker-sym">👑 OWNER:</span> TUSHAR MASTER</span>
+        <span class="ticker-sep">│</span>
+      </div>
+      <div class="ticker-track" aria-hidden="true">
+        <span class="ticker-item green"><span class="ticker-sym">▲ PLAY</span> FAV GAMES</span>
+        <span class="ticker-sep">│</span>
+        <span class="ticker-item yellow"><span class="ticker-sym">● 0</span> DOWNLOAD REQUIRED</span>
+        <span class="ticker-sep">│</span>
+        <span class="ticker-item cyan"><span class="ticker-sym">◆ 100%</span> BROWSER OFFLINE</span>
+        <span class="ticker-sep">│</span>
+        <span class="ticker-item pink"><span class="ticker-sym">▲ ZERO</span> INPUT LAG (0ms)</span>
+        <span class="ticker-sep">│</span>
+        <span class="ticker-item gold"><span class="ticker-sym">★ ALADDIN</span> SNES +100%</span>
+        <span class="ticker-sep">│</span>
+        <span class="ticker-item green"><span class="ticker-sym">▲ NEW SUPER</span> MARIO BROS NDS</span>
+        <span class="ticker-sep">│</span>
+        <span class="ticker-item orange"><span class="ticker-sym">★ SUPER MARIO</span> 1:1 CLASSIC</span>
+        <span class="ticker-sep">│</span>
+        <span class="ticker-item blue"><span class="ticker-sym">🔄 1-TAP</span> LANDSCAPE FULLSCREEN</span>
+        <span class="ticker-sep">│</span>
+        <span class="ticker-item gold"><span class="ticker-sym">👑 OWNER:</span> TUSHAR MASTER</span>
+        <span class="ticker-sep">│</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="status-banner">
+    💎 <strong>AUTHENTIC RETRO BOX ART &amp; HIGH-PERFORMANCE WEB EMULATION</strong><br>
+    Play with <strong>PC Keyboard (WASD / Arrows)</strong> or <strong>Touch HUD</strong> · Haptic &amp; Sound FX.<br>
+    Tap any game below to launch instantly in your browser!
+  </div>
+
+  <div class="section-title">📦 PLAY YOUR INJECTED GAMES</div>
+  <div class="games-grid">
+
+    <!-- GAME 1: ALADDIN (SNES) -->
+    <div class="game-card aladdin" onclick="bootInjectedGame('aladdin')">
+      <div class="card-cover-wrap">
+        <img class="game-cover-art" src="covers/aladdin_thumb.jpg" alt="Disney's Aladdin SNES Cover" />
+        <span class="cover-badge gold">SNES</span>
+      </div>
+      <div class="card-name">ALADDIN</div>
+      <div class="card-desc">CAPCOM SNES CLASSIC<br>INJECTED (1.25 MB)</div>
+      <span class="card-badge gold">PLAY NOW</span>
+    </div>
+
+    <!-- GAME 2: ULTIMATE MORTAL KOMBAT 3 (SNES) -->
+    <div class="game-card umk3" onclick="bootInjectedGame('umk3')">
+      <div class="card-cover-wrap">
+        <img class="game-cover-art" src="covers/umk3_thumb.jpg" alt="Ultimate Mortal Kombat 3 Cover" />
+        <span class="cover-badge purple">SNES</span>
+      </div>
+      <div class="card-name">MORTAL KOMBAT 3</div>
+      <div class="card-desc">ULTIMATE EDITION<br>INJECTED (4.0 MB)</div>
+      <span class="card-badge gold">PLAY NOW</span>
+    </div>
+
+    <!-- GAME 3: STREET FIGHTER (SNES) -->
+    <div class="game-card sf5" onclick="bootInjectedGame('sf5')">
+      <div class="card-cover-wrap">
+        <img class="game-cover-art" src="covers/sf5_thumb.jpg" alt="Street Fighter SNES Cover" />
+        <span class="cover-badge red">SNES</span>
+      </div>
+      <div class="card-name">STREET FIGHTER</div>
+      <div class="card-desc">ARCADE FIGHTING<br>INJECTED (2.0 MB)</div>
+      <span class="card-badge gold">PLAY NOW</span>
+    </div>
+
+    <!-- GAME 4: CONTRA 4 (NDS) -->
+    <div class="game-card contra4" onclick="bootInjectedGame('contra4')">
+      <div class="card-cover-wrap">
+        <img class="game-cover-art" src="covers/contra4_thumb.jpg" alt="Contra 4 NDS Cover" />
+        <span class="cover-badge teal">NDS</span>
+      </div>
+      <div class="card-name">CONTRA 4</div>
+      <div class="card-desc">DUAL SCREEN ACTION<br>INJECTED (32 MB)</div>
+      <span class="card-badge gold">PLAY NOW</span>
+    </div>
+
+    <!-- GAME 5: CONTRA FORCE (NES) -->
+    <div class="game-card contra-force" onclick="bootInjectedGame('contra-force')">
+      <div class="card-cover-wrap">
+        <img class="game-cover-art" src="covers/contraForce_thumb.jpg" alt="Contra Force NES Cover" />
+        <span class="cover-badge yellow">NES</span>
+      </div>
+      <div class="card-name">CONTRA FORCE</div>
+      <div class="card-desc">8-BIT KONAMI HIT<br>INJECTED (256 KB)</div>
+      <span class="card-badge gold">PLAY NOW</span>
+    </div>
+
+    <!-- GAME 6: NEW SUPER MARIO BROS (NDS) -->
+    <div class="game-card mario-nds" onclick="bootInjectedGame('mario-nds')">
+      <div class="card-cover-wrap">
+        <img class="game-cover-art" src="covers/marioNds_thumb.jpg" alt="New Super Mario Bros NDS Cover" />
+        <span class="cover-badge red">NDS</span>
+      </div>
+      <div class="card-name">NEW SUPER MARIO BROS</div>
+      <div class="card-desc">NINTENDO DS ROM<br>INJECTED (32 MB)</div>
+      <span class="card-badge gold">PLAY NOW</span>
+    </div>
+
+    <!-- GAME 7: SUPER MARIO BROS (CLASSIC 1:1) -->
+    <div class="game-card mario-classic" onclick="bootInjectedGame('mario-classic')">
+      <div class="card-cover-wrap">
+        <img class="game-cover-art" src="covers/marioClassic_thumb.jpg" alt="Super Mario Bros NES Cover" />
+        <span class="cover-badge orange">CLASSIC</span>
+      </div>
+      <div class="card-name">SUPER MARIO BROS</div>
+      <div class="card-desc">AUTHENTIC 1:1 PORT<br>INJECTED (64 KB)</div>
+      <span class="card-badge">PLAY NOW</span>
+    </div>
+
+</div>
+
+  <input type="file" id="hidden-file-input" accept=".zip,.sfc,.smc,.nes,.bin,.gba,.gb,.gbc,.nds,.gen,.md" onchange="handleFileSelect(this.files)">
+
+  <div class="action-bar">
+    <button class="arcade-btn" onclick="exportRom('aladdin', 'Aladdin (USA).sfc')">💾 ALADDIN</button>
+    <button class="arcade-btn" onclick="exportRom('umk3', 'Ultimate Mortal Kombat 3.sfc')">💾 UMK3</button>
+    <button class="arcade-btn" onclick="exportRom('sf5', 'Street Fighter.smc')">💾 STREET FIGHTER</button>
+    <button class="arcade-btn" onclick="exportRom('contra4', 'Contra 4.nds')">💾 CONTRA 4</button>
+    <button class="arcade-btn" onclick="exportRom('contra-force', 'Contra Force.nes')">💾 CONTRA FORCE</button>
+    <button class="arcade-btn" onclick="exportRom('mario-classic', 'Super Mario Bros.bin')">💾 SMB CLASSIC</button>
+    <button class="arcade-btn" onclick="exportRom('mario-nds', 'New Super Mario Bros.nds')">💾 MARIO NDS</button>
+  </div>
+
+  <!-- OWNER PANEL -->
+  <div class="owner-panel">
+    <div class="owner-inner">
+      <span class="oc-star">★</span>
+      <span class="oc-star">★</span>
+      <span class="oc-star">★</span>
+      <span class="oc-star">★</span>
+      <div class="oc-divider">━━━━━━━━━━━━━━━━━━━━━━━━━━━━</div>
+      <div class="oc-label">CREATED &amp; OWNED BY</div>
+      <div class="oc-name">T U S H A R</div>
+      <div class="oc-rank">⚡ RETRO ARCADE MASTER ⚡</div>
+      <div class="oc-divider">━━━━━━━━━━━━━━━━━━━━━━━━━━━━</div>
+      <div class="oc-badges">
+        <span class="oc-badge green">GITHUB PAGES READY</span>
+        <span class="oc-badge blue">PC KEYBOARD READY</span>
+        <span class="oc-badge pink">D-PAD TOGGLE HUD</span>
+        <span class="oc-badge gold">ZERO-LAG CONTROLS</span>
+      </div>
+      <div class="oc-copy">© 2026 TUSHAR — ALL RIGHTS RESERVED</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     ACTIVE EMULATOR SCREEN
+═══════════════════════════════════════ -->
+<div id="emu-screen">
+  <div id="emu-topbar">
+    <div class="emu-title-text" id="emu-title">🎮 LOADING GAME...</div>
+    <div class="topbar-actions">
+      <button class="topbar-btn orient-toggle" id="btn-orient" onclick="toggleLandscape()">🔄 LANDSCAPE</button>
+      <button class="topbar-btn mode-toggle" id="btn-toggle-dpad" onclick="toggleDpadVisibility()">📱 D-PAD: ON</button>
+      <button class="topbar-btn pos-toggle" id="btn-toggle-pos" onclick="cycleControllerPosition()">🕹️ POS: HANDY</button>
+      <button class="topbar-btn sfx-toggle" id="btn-toggle-sfx" onclick="toggleSoundFx()">🔊 SFX: ON</button>
+      <button class="topbar-btn ctrl-toggle" id="btn-toggle-ctrl" onclick="cycleControllerOpacity()">👁️ PAD: 100%</button>
+      <button class="topbar-btn" onclick="toggleFullscreen()">⛶ FULL</button>
+      <button class="topbar-btn exit" onclick="exitEmulator()">✕ EXIT</button>
+    </div>
+  </div>
+
+  <div id="game-container">
+    <div id="game-target"></div>
+    <div id="keyboard-legend">
+      <span class="kl-tag">⌨️ PC CONTROLS</span>
+      <span class="kl-item"><span class="kl-k">ARROWS / WASD</span> Move</span>
+      <span class="kl-sep">│</span>
+      <span class="kl-item"><span class="kl-k">Z / J</span> B Run</span>
+      <span class="kl-sep">│</span>
+      <span class="kl-item"><span class="kl-k">X / K / SPACE</span> A Jump</span>
+      <span class="kl-sep">│</span>
+      <span class="kl-item"><span class="kl-k">C / I</span> X</span>
+      <span class="kl-sep">│</span>
+      <span class="kl-item"><span class="kl-k">V / U</span> Y</span>
+      <span class="kl-sep">│</span>
+      <span class="kl-item"><span class="kl-k">Q / E</span> L / R</span>
+      <span class="kl-sep">│</span>
+      <span class="kl-item"><span class="kl-k">ENTER</span> Start</span>
+      <span class="kl-sep">│</span>
+      <span class="kl-item"><span class="kl-k">H</span> D-Pad</span>
+    </div>
+  </div>
+
+  <!-- ARCADE COMPACT NON-BLOCKING LOADER -->
+  <div id="arcade-loader">
+    <div class="loader-card">
+      <div class="loader-spinner"></div>
+      <div class="loader-title" id="loader-title">LOADING GAME...</div>
+      <div class="loader-status" id="loader-status">Extracting injected ROM data...</div>
+      <div class="loader-bar-track">
+        <div class="loader-bar-fill" id="loader-bar-fill"></div>
+      </div>
+      <div class="loader-note" id="loader-note">⚡ Launching WebAssembly emulator engine...</div>
+      <div id="loader-error-box" style="display:none;">
+        <div class="loader-err-msg" id="loader-err-text">Unable to load emulator engine.</div>
+        <button class="loader-retry-btn" onclick="retryCurrentGame()">🔄 RETRY</button>
+        <button class="loader-retry-btn" onclick="exitEmulator()">⬅ MENU</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FLOATING ERGONOMIC TOUCH CONTROLLER (ALWAYS VISIBLE & HIGHEST Z-INDEX) -->
+  <div id="virtual-controller">
+    <!-- SHOULDER BUMPERS -->
+    <div class="shoulder-row">
+      <button class="shoulder-btn btn-L" data-ctrl="l">L</button>
+      <button class="shoulder-btn btn-R" data-ctrl="r">R</button>
+    </div>
+
+    <!-- SELECT & START PILLS -->
+    <div class="mid-pills">
+      <button class="pill-btn" data-ctrl="select">SELECT</button>
+      <button class="pill-btn" data-ctrl="start">START</button>
+    </div>
+
+    <!-- 8-WAY ERGONOMIC D-PAD (LEFT THUMB) -->
+    <div class="dpad-zone" id="dpad-zone">
+      <div class="dpad-cross">
+        <div class="dp-arm dp-up" data-ctrl="up"><span>▲</span></div>
+        <div class="dp-arm dp-right" data-ctrl="right"><span>►</span></div>
+        <div class="dp-arm dp-down" data-ctrl="down"><span>▼</span></div>
+        <div class="dp-arm dp-left" data-ctrl="left"><span>◄</span></div>
+        <div class="dp-center"></div>
+      </div>
+    </div>
+
+    <!-- ABXY ACTION DIAMOND (RIGHT THUMB) -->
+    <div class="abxy-zone" id="abxy-zone">
+      <div class="abxy-diamond">
+        <button class="act-btn btn-X" data-ctrl="x">X</button>
+        <button class="act-btn btn-Y" data-ctrl="y">Y</button>
+        <button class="act-btn btn-A" data-ctrl="a">A</button>
+        <button class="act-btn btn-B" data-ctrl="b">B</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+// INJECTED RAW GAME ROMS (ALL-IN-ONE)
+// ═══════════════════════════════════════════════
+// Dynamic ROM loading & engine systems
+
+const GAME_CONFIGS = {
+  'aladdin': {
+    title: 'ALADDIN (SNES)',
+    core: 'snes',
+    romUrl: 'roms/Aladdin (USA).sfc',
+    filename: 'Aladdin (USA).sfc'
+  },
+  'umk3': {
+    title: 'ULTIMATE MORTAL KOMBAT 3 (SNES)',
+    core: 'snes',
+    romUrl: 'roms/Ultimate Mortal Kombat 3 (USA).sfc',
+    filename: 'Ultimate Mortal Kombat 3 (USA).sfc'
+  },
+  'sf5': {
+    title: 'STREET FIGHTER (SNES)',
+    core: 'snes',
+    romUrl: 'roms/Street Fighter 5 (Hack).smc',
+    filename: 'Street Fighter 5 (Hack).smc'
+  },
+  'contra4': {
+    title: 'CONTRA 4 (NDS)',
+    core: 'nds',
+    romUrl: 'roms/Contra 4 (USA).nds',
+    filename: 'Contra 4 (USA).nds'
+  },
+  'contra-force': {
+    title: 'CONTRA FORCE (NES)',
+    core: 'nes',
+    romUrl: 'roms/Contra Force (USA).nes',
+    filename: 'Contra Force (USA).nes'
+  },
+  'mario-nds': {
+    title: 'NEW SUPER MARIO BROS (NDS)',
+    core: 'nds',
+    romUrl: 'roms/New Super Mario Bros. (USA).nds',
+    filename: 'New Super Mario Bros. (USA).nds'
+  },
+  'mario-classic': {
+    title: 'SUPER MARIO BROS (CLASSIC 1:1)',
+    core: 'segaMD',
+    romUrl: 'roms/smb.bin',
+    filename: 'smb.bin'
+  }
+};
+
+// ═══════════════════════════════════════════════
+// INDEXEDDB PERSISTENT ROM CACHE (0ms RE-LOADS)
+// ═══════════════════════════════════════════════
+const DB_NAME = 'TusharRetroArcadeDB';
+const DB_VERSION = 1;
+const STORE_NAME = 'rom_cache';
+
+function openRomDb() {
+  return new Promise((resolve) => {
+    if (!window.indexedDB) return resolve(null);
+    const req = indexedDB.open(DB_NAME, DB_VERSION);
+    req.onupgradeneeded = () => {
+      req.result.createObjectStore(STORE_NAME);
+    };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => resolve(null);
+  });
+}
+
+async function getCachedRom(key) {
+  try {
+    const db = await openRomDb();
+    if (!db) return null;
+    return new Promise(resolve => {
+      const tx = db.transaction(STORE_NAME, 'readonly');
+      const store = tx.objectStore(STORE_NAME);
+      const req = store.get(key);
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => resolve(null);
+    });
+  } catch(e) { return null; }
+}
+
+async function saveCachedRom(key, blob) {
+  try {
+    const db = await openRomDb();
+    if (!db) return;
+    const tx = db.transaction(STORE_NAME, 'readwrite');
+    tx.objectStore(STORE_NAME).put(blob, key);
+  } catch(e) {}
+}
+
+// ═══════════════════════════════════════════════
+// PROCEDURAL RETRO SOUND FX ENGINE (WEB AUDIO API)
+// ═══════════════════════════════════════════════
+let audioCtx = null;
+let soundEnabled = true;
+
+function getAudioContext() {
+  if (!audioCtx) {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (AudioContextClass) audioCtx = new AudioContextClass();
+  }
+  if (audioCtx && audioCtx.state === 'suspended') {
+    audioCtx.resume().catch(() => {});
+  }
+  return audioCtx;
+}
+
+function playButtonSound(ctrlKey) {
+  if (!soundEnabled) return;
+  try {
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    if (['up', 'down', 'left', 'right'].includes(ctrlKey)) {
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(160, now);
+      osc.frequency.exponentialRampToValueAtTime(45, now + 0.022);
+      gain.gain.setValueAtTime(0.12, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.022);
+      osc.start(now);
+      osc.stop(now + 0.022);
+    } else if (['a', 'b', 'x', 'y'].includes(ctrlKey)) {
+      const freqs = { a: 540, b: 440, x: 660, y: 500 };
+      const freq = freqs[ctrlKey] || 500;
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(freq, now);
+      osc.frequency.exponentialRampToValueAtTime(freq * 0.45, now + 0.035);
+      gain.gain.setValueAtTime(0.14, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.035);
+      osc.start(now);
+      osc.stop(now + 0.035);
+    } else if (['l', 'r'].includes(ctrlKey)) {
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(750, now);
+      osc.frequency.exponentialRampToValueAtTime(200, now + 0.04);
+      gain.gain.setValueAtTime(0.15, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+      osc.start(now);
+      osc.stop(now + 0.04);
+    } else if (['start', 'select'].includes(ctrlKey)) {
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(880, now);
+      osc.frequency.setValueAtTime(1320, now + 0.04);
+      gain.gain.setValueAtTime(0.18, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
+      osc.start(now);
+      osc.stop(now + 0.09);
+    }
+  } catch(e) {}
+}
+
+function toggleSoundFx() {
+  soundEnabled = !soundEnabled;
+  const btn = document.getElementById('btn-toggle-sfx');
+  if (btn) btn.textContent = soundEnabled ? '🔊 SFX: ON' : '🔇 SFX: OFF';
+  triggerHaptic('start');
+  if (soundEnabled) playButtonSound('start');
+}
+
+// ═══════════════════════════════════════════════
+// HAPTIC VIBRATION FEEDBACK ENGINE
+// ═══════════════════════════════════════════════
+let hapticEnabled = true;
+function triggerHaptic(ctrlKey) {
+  if (!hapticEnabled || !navigator.vibrate) return;
+  try {
+    if (['l', 'r', 'start', 'select'].includes(ctrlKey)) {
+      navigator.vibrate(28);
+    } else if (['a', 'b', 'x', 'y'].includes(ctrlKey)) {
+      navigator.vibrate(18);
+    } else {
+      navigator.vibrate(12);
+    }
+  } catch(e) {}
+}
+
+// ═══════════════════════════════════════════════
+// ERGONOMIC POSITION CONTROLLER (HANDY / HIGH / LOW)
+// ═══════════════════════════════════════════════
+const POS_PRESETS = [
+  { name: 'HANDY', portrait: 'clamp(130px, 18vh, 200px)', landscape: 'clamp(70px, 18vh, 130px)' },
+  { name: 'HIGH',  portrait: 'clamp(180px, 24vh, 250px)', landscape: 'clamp(110px, 25vh, 180px)' },
+  { name: 'LOW',   portrait: 'clamp(70px, 10vh, 110px)',  landscape: 'clamp(30px, 8vh, 60px)' }
+];
+let currentPosIndex = 0;
+
+function cycleControllerPosition() {
+  currentPosIndex = (currentPosIndex + 1) % POS_PRESETS.length;
+  const preset = POS_PRESETS[currentPosIndex];
+  document.documentElement.style.setProperty('--ctrl-bottom-portrait', preset.portrait);
+  document.documentElement.style.setProperty('--ctrl-bottom-landscape', preset.landscape);
+  const btn = document.getElementById('btn-toggle-pos');
+  if (btn) btn.textContent = '🕹️ POS: ' + preset.name;
+  triggerHaptic('start');
+  playButtonSound('start');
+  setTimeout(cacheInputGeometry, 80);
+}
+
+// ═══════════════════════════════════════════════
+// D-PAD & TOUCH LAYOUT HIDE/SHOW (PC MODE)
+// ═══════════════════════════════════════════════
+let dpadVisible = true;
+
+function toggleDpadVisibility() {
+  dpadVisible = !dpadVisible;
+  const ctrl = document.getElementById('virtual-controller');
+  const btn = document.getElementById('btn-toggle-dpad');
+  const legend = document.getElementById('keyboard-legend');
+
+  if (ctrl) {
+    ctrl.style.display = dpadVisible ? 'block' : 'none';
+    if (dpadVisible) ctrl.style.opacity = OPACITY_STEPS[opacityIndex].val;
+  }
+
+  if (btn) {
+    btn.textContent = dpadVisible ? '📱 D-PAD: ON' : '⌨️ PC MODE';
+    if (dpadVisible) {
+      btn.classList.remove('pc-mode-active');
+    } else {
+      btn.classList.add('pc-mode-active');
+    }
+  }
+
+  if (legend) {
+    legend.style.display = dpadVisible ? 'none' : 'flex';
+  }
+
+  triggerHaptic('select');
+  playButtonSound('select');
+
+  if (dpadVisible) {
+    setTimeout(cacheInputGeometry, 80);
+  }
+}
+
+// ═══════════════════════════════════════════════
+// GLOBAL PC KEYBOARD CONTROLLER ENGINE
+// ═══════════════════════════════════════════════
+const PC_KEY_MAP = {
+  'ArrowUp': 'up',
+  'ArrowDown': 'down',
+  'ArrowLeft': 'left',
+  'ArrowRight': 'right',
+  'KeyW': 'up',
+  'KeyS': 'down',
+  'KeyA': 'left',
+  'KeyD': 'right',
+  'KeyX': 'a',
+  'KeyK': 'a',
+  'Space': 'a',
+  'KeyZ': 'b',
+  'KeyJ': 'b',
+  'KeyC': 'x',
+  'KeyI': 'x',
+  'KeyV': 'y',
+  'KeyU': 'y',
+  'KeyQ': 'l',
+  'KeyE': 'r',
+  'Enter': 'start',
+  'ShiftLeft': 'select',
+  'ShiftRight': 'select',
+  'Tab': 'select'
+};
+
+window.addEventListener('keydown', (e) => {
+  if (!e.isTrusted) return;
+  const emuScreen = document.getElementById('emu-screen');
+  if (!emuScreen || !emuScreen.classList.contains('active')) return;
+
+  if ((e.code === 'KeyH' || e.key === 'h' || e.key === 'H') && !e.repeat) {
+    toggleDpadVisibility();
+    return;
+  }
+
+  const ctrlKey = PC_KEY_MAP[e.code] || PC_KEY_MAP[e.key];
+  if (ctrlKey) {
+    e.preventDefault();
+    setButtonState(ctrlKey, true);
+  }
+}, { capture: true, passive: false });
+
+window.addEventListener('keyup', (e) => {
+  if (!e.isTrusted) return;
+  const emuScreen = document.getElementById('emu-screen');
+  if (!emuScreen || !emuScreen.classList.contains('active')) return;
+
+  const ctrlKey = PC_KEY_MAP[e.code] || PC_KEY_MAP[e.key];
+  if (ctrlKey) {
+    e.preventDefault();
+    setButtonState(ctrlKey, false);
+  }
+}, { capture: true, passive: false });
+
+let currentBlobUrl = null;
+let lastBootedGame = null;
+let checkRenderInterval = null;
+let isLandscapeForced = false;
+
+function b64toBlob(b64, mimeType = 'application/octet-stream') {
+  const sliceSize = 1024 * 512;
+  const byteCharacters = atob(b64);
+  const byteArrays = [];
+  for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+    const slice = byteCharacters.slice(offset, offset + sliceSize);
+    const byteNumbers = new Uint8Array(slice.length);
+    for (let i = 0; i < slice.length; i++) {
+      byteNumbers[i] = slice.charCodeAt(i);
+    }
+    byteArrays.push(byteNumbers);
+  }
+  return new Blob(byteArrays, { type: mimeType });
+}
+
+// ═══════════════════════════════════════════════
+// LANDSCAPE & ROTATION CONTROLLER
+// ═══════════════════════════════════════════════
+async function toggleLandscape() {
+  const emuScreen = document.getElementById('emu-screen');
+  const btn = document.getElementById('btn-orient');
+
+  // 1. Try native Screen Orientation API
+  try {
+    if (!document.fullscreenElement) {
+      await document.documentElement.requestFullscreen();
+    }
+    if (screen.orientation && screen.orientation.lock) {
+      if (screen.orientation.type && screen.orientation.type.startsWith('landscape')) {
+        await screen.orientation.unlock();
+        if (btn) btn.textContent = '🔄 LANDSCAPE';
+        emuScreen.classList.remove('force-landscape');
+        isLandscapeForced = false;
+        setTimeout(cacheInputGeometry, 150);
+        return;
+      } else {
+        await screen.orientation.lock('landscape');
+        if (btn) btn.textContent = '🔄 PORTRAIT';
+        setTimeout(cacheInputGeometry, 150);
+        return;
+      }
+    }
+  } catch(e) {
+    // Native lock blocked or unsupported — trigger CSS 90° rotation fallback
+  }
+
+  // 2. CSS 90-degree rotate fallback (works 100% even if Auto-Rotate is locked on Android)
+  isLandscapeForced = !isLandscapeForced;
+  if (isLandscapeForced) {
+    emuScreen.classList.add('force-landscape');
+    if (btn) btn.textContent = '🔄 PORTRAIT';
+  } else {
+    emuScreen.classList.remove('force-landscape');
+    if (btn) btn.textContent = '🔄 LANDSCAPE';
+  }
+  setTimeout(cacheInputGeometry, 150);
+}
+
+// Listen to physical device rotation so buttons and layout auto-update
+window.addEventListener('orientationchange', () => {
+  const btn = document.getElementById('btn-orient');
+  const isLand = window.innerWidth > window.innerHeight;
+  if (btn) btn.textContent = isLand ? '🔄 PORTRAIT' : '🔄 LANDSCAPE';
+  setTimeout(cacheInputGeometry, 150);
+});
+
+window.addEventListener('resize', () => {
+  setTimeout(cacheInputGeometry, 100);
+});
+
+// ═══════════════════════════════════════════════
+// ULTRA-FAST ZERO-LAG TOUCH CONTROLLER ENGINE
+// ═══════════════════════════════════════════════
+const CONTROLLER_MAP = {
+  up:     { retroId: 4,  gpBtn: 12, axis: [1, -1.0], key: 'ArrowUp',    code: 'ArrowUp',    keyCode: 38 },
+  down:   { retroId: 5,  gpBtn: 13, axis: [1, 1.0],  key: 'ArrowDown',  code: 'ArrowDown',  keyCode: 40 },
+  left:   { retroId: 6,  gpBtn: 14, axis: [0, -1.0], key: 'ArrowLeft',  code: 'ArrowLeft',  keyCode: 37 },
+  right:  { retroId: 7,  gpBtn: 15, axis: [0, 1.0],  key: 'ArrowRight', code: 'ArrowRight', keyCode: 39 },
+  a:      { retroId: 8,  gpBtn: 0,                   key: 'x',          code: 'KeyX',       keyCode: 88 },
+  b:      { retroId: 0,  gpBtn: 1,                   key: 'z',          code: 'KeyZ',       keyCode: 90 },
+  x:      { retroId: 9,  gpBtn: 3,                   key: 'c',          code: 'KeyC',       keyCode: 67 },
+  y:      { retroId: 1,  gpBtn: 2,                   key: 'v',          code: 'KeyV',       keyCode: 86 },
+  l:      { retroId: 10, gpBtn: 4,                   key: 'q',          code: 'KeyQ',       keyCode: 81 },
+  r:      { retroId: 11, gpBtn: 5,                   key: 'e',          code: 'KeyE',       keyCode: 69 },
+  select: { retroId: 2,  gpBtn: 8,                   key: 'Shift',      code: 'ShiftRight', keyCode: 16 },
+  start:  { retroId: 3,  gpBtn: 9,                   key: 'Enter',      code: 'Enter',      keyCode: 13 }
+};
+
+const ctrlState = {};
+const ctrlElements = {};
+Object.keys(CONTROLLER_MAP).forEach(k => {
+  ctrlState[k] = false;
+});
+
+// Cache DOM element references once
+function cacheButtonElements() {
+  Object.keys(CONTROLLER_MAP).forEach(k => {
+    ctrlElements[k] = document.querySelector('[data-ctrl="' + k + '"]');
+  });
+}
+
+// Standard W3C Gamepad Mock for WebAssembly RetroArch
+const virtualGamepadState = {
+  id: "Tushar Zero-Lag Touch Gamepad (Vendor: 0000 Product: 0000)",
+  index: 0,
+  connected: true,
+  timestamp: performance.now(),
+  mapping: "standard",
+  axes: [0, 0, 0, 0],
+  buttons: Array.from({ length: 16 }, () => ({ pressed: false, touched: false, value: 0 }))
+};
+
+const origGetGamepads = navigator.getGamepads ? navigator.getGamepads.bind(navigator) : null;
+navigator.getGamepads = function() {
+  const list = origGetGamepads ? Array.from(origGetGamepads()) : [];
+  if (!list[0]) {
+    virtualGamepadState.timestamp = performance.now();
+    return [virtualGamepadState, null, null, null];
+  }
+  return list;
+};
+
+// Fast Keyboard Dispatch (Synthetic fallback)
+function fastDispatchKey(type, def) {
+  const evt = new KeyboardEvent(type, {
+    key: def.key,
+    code: def.code,
+    keyCode: def.keyCode,
+    which: def.keyCode,
+    bubbles: true,
+    cancelable: true,
+    composed: true
+  });
+  try {
+    Object.defineProperty(evt, 'keyCode', { get: () => def.keyCode });
+    Object.defineProperty(evt, 'which', { get: () => def.keyCode });
+  } catch(e) {}
+
+  window.dispatchEvent(evt);
+  document.dispatchEvent(evt);
+}
+
+// Instant synchronous state update
+function setButtonState(ctrlKey, isPressed) {
+  if (ctrlState[ctrlKey] === isPressed) return;
+  ctrlState[ctrlKey] = isPressed;
+
+  const def = CONTROLLER_MAP[ctrlKey];
+  if (!def) return;
+
+  const el = ctrlElements[ctrlKey];
+  if (el) {
+    if (isPressed) el.classList.add('pressed');
+    else el.classList.remove('pressed');
+  }
+
+  if (isPressed) {
+    triggerHaptic(ctrlKey);
+    playButtonSound(ctrlKey);
+  }
+
+  if (def.gpBtn !== undefined) {
+    virtualGamepadState.buttons[def.gpBtn].pressed = isPressed;
+    virtualGamepadState.buttons[def.gpBtn].touched = isPressed;
+    virtualGamepadState.buttons[def.gpBtn].value = isPressed ? 1.0 : 0.0;
+  }
+  if (def.axis) {
+    const [axisIdx, val] = def.axis;
+    virtualGamepadState.axes[axisIdx] = isPressed ? val : 0.0;
+  }
+  virtualGamepadState.timestamp = performance.now();
+
+  if (window.EJS_emulator && window.EJS_emulator.gameManager && typeof window.EJS_emulator.gameManager.simulateInput === 'function') {
+    try {
+      window.EJS_emulator.gameManager.simulateInput(0, def.retroId, isPressed ? 1 : 0);
+    } catch(e) {}
+  }
+
+  fastDispatchKey(isPressed ? 'keydown' : 'keyup', def);
+}
+
+// ═══════════════════════════════════════════════
+// REFLOW-FREE GEOMETRY CACHING & MULTI-TOUCH
+// ═══════════════════════════════════════════════
+let dpadCenter = { x: 0, y: 0, r: 70 };
+let abxyButtons = [];
+let geometryCached = false;
+
+function cacheInputGeometry() {
+  const dpadZone = document.getElementById('dpad-zone');
+  if (dpadZone) {
+    const rect = dpadZone.getBoundingClientRect();
+    dpadCenter = {
+      x: rect.left + rect.width / 2,
+      y: rect.top + rect.height / 2,
+      r: rect.width / 2
+    };
+  }
+
+  const abxyZone = document.getElementById('abxy-zone');
+  if (abxyZone) {
+    abxyButtons = Array.from(abxyZone.querySelectorAll('.act-btn')).map(btn => {
+      const rect = btn.getBoundingClientRect();
+      return {
+        key: btn.getAttribute('data-ctrl'),
+        x: rect.left + rect.width / 2,
+        y: rect.top + rect.height / 2,
+        r: rect.width / 2 + 14 // +14px generous thumb pad for fast platforming
+      };
+    });
+  }
+
+  cacheButtonElements();
+  geometryCached = true;
+}
+
+// D-PAD TOUCH TRACKING (Instant Trigonometry / 0 DOM reflows)
+let dpadInitialized = false;
+function initDpadTracking() {
+  if (dpadInitialized) return;
+  dpadInitialized = true;
+
+  const dpadZone = document.getElementById('dpad-zone');
+  if (!dpadZone) return;
+
+  let activeTouchId = null;
+
+  function updateDpadFromCoords(clientX, clientY) {
+    const dx = clientX - dpadCenter.x;
+    const dy = clientY - dpadCenter.y;
+    const deadZone = 14;
+
+    const dist = Math.hypot(dx, dy);
+    if (dist < deadZone) {
+      setButtonState('up', false);
+      setButtonState('down', false);
+      setButtonState('left', false);
+      setButtonState('right', false);
+      return;
+    }
+
+    // 8-way smooth diagonal threshold (22.5 deg overlap)
+    const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+    const isUp    = angle < -22.5 && angle > -157.5;
+    const isDown  = angle > 22.5  && angle < 157.5;
+    const isRight = angle > -67.5 && angle < 67.5;
+    const isLeft  = angle > 112.5 || angle < -112.5;
+
+    setButtonState('up', isUp);
+    setButtonState('down', isDown);
+    setButtonState('left', isLeft);
+    setButtonState('right', isRight);
+  }
+
+  function resetDpad() {
+    setButtonState('up', false);
+    setButtonState('down', false);
+    setButtonState('left', false);
+    setButtonState('right', false);
+  }
+
+  dpadZone.addEventListener('touchstart', e => {
+    e.preventDefault();
+    if (!geometryCached) cacheInputGeometry();
+    const t = e.changedTouches[0];
+    activeTouchId = t.identifier;
+    updateDpadFromCoords(t.clientX, t.clientY);
+  }, { passive: false });
+
+  dpadZone.addEventListener('touchmove', e => {
+    e.preventDefault();
+    for (let i = 0; i < e.touches.length; i++) {
+      if (e.touches[i].identifier === activeTouchId) {
+        updateDpadFromCoords(e.touches[i].clientX, e.touches[i].clientY);
+        break;
+      }
+    }
+  }, { passive: false });
+
+  function onTouchEnd(e) {
+    for (let i = 0; i < e.changedTouches.length; i++) {
+      if (e.changedTouches[i].identifier === activeTouchId) {
+        activeTouchId = null;
+        resetDpad();
+        break;
+      }
+    }
+  }
+
+  dpadZone.addEventListener('touchend', onTouchEnd, { passive: false });
+  dpadZone.addEventListener('touchcancel', onTouchEnd, { passive: false });
+
+  // Mouse fallback for PC testing
+  let isMouseDown = false;
+  dpadZone.addEventListener('mousedown', e => {
+    isMouseDown = true;
+    cacheInputGeometry();
+    updateDpadFromCoords(e.clientX, e.clientY);
+  });
+  window.addEventListener('mousemove', e => {
+    if (isMouseDown) updateDpadFromCoords(e.clientX, e.clientY);
+  });
+  window.addEventListener('mouseup', () => {
+    if (isMouseDown) {
+      isMouseDown = false;
+      resetDpad();
+    }
+  });
+}
+
+// ACTION BUTTONS (X, Y, A, B) & MULTI-TOUCH ROLLING (B+A Run & Jump)
+let actionsInitialized = false;
+function initActionButtons() {
+  if (actionsInitialized) return;
+  actionsInitialized = true;
+
+  const abxyZone = document.getElementById('abxy-zone');
+  if (!abxyZone) return;
+
+  function processAbxyTouches(touchList) {
+    const activeKeys = new Set();
+    for (let i = 0; i < touchList.length; i++) {
+      const t = touchList[i];
+      for (let j = 0; j < abxyButtons.length; j++) {
+        const b = abxyButtons[j];
+        const dist = Math.hypot(t.clientX - b.x, t.clientY - b.y);
+        if (dist <= b.r) {
+          activeKeys.add(b.key);
+        }
+      }
+    }
+    ['a', 'b', 'x', 'y'].forEach(k => {
+      setButtonState(k, activeKeys.has(k));
+    });
+  }
+
+  abxyZone.addEventListener('touchstart', e => {
+    e.preventDefault();
+    if (!geometryCached || abxyButtons.length === 0) cacheInputGeometry();
+    processAbxyTouches(e.targetTouches);
+  }, { passive: false });
+
+  abxyZone.addEventListener('touchmove', e => {
+    e.preventDefault();
+    processAbxyTouches(e.targetTouches);
+  }, { passive: false });
+
+  abxyZone.addEventListener('touchend', e => {
+    e.preventDefault();
+    processAbxyTouches(e.targetTouches);
+  }, { passive: false });
+
+  abxyZone.addEventListener('touchcancel', () => {
+    ['a', 'b', 'x', 'y'].forEach(k => setButtonState(k, false));
+  });
+
+  // Mouse fallback
+  const actBtns = abxyZone.querySelectorAll('.act-btn');
+  actBtns.forEach(btn => {
+    const k = btn.getAttribute('data-ctrl');
+    btn.addEventListener('mousedown', e => { e.preventDefault(); setButtonState(k, true); });
+    btn.addEventListener('mouseup', e => { e.preventDefault(); setButtonState(k, false); });
+    btn.addEventListener('mouseleave', () => setButtonState(k, false));
+  });
+}
+
+// SHOULDER & PILL BUTTONS (L, R, SELECT, START)
+let auxInitialized = false;
+function initAuxButtons() {
+  if (auxInitialized) return;
+  auxInitialized = true;
+
+  const auxBtns = document.querySelectorAll('.shoulder-btn, .pill-btn');
+  auxBtns.forEach(btn => {
+    const k = btn.getAttribute('data-ctrl');
+    if (!k) return;
+
+    btn.addEventListener('touchstart', e => {
+      e.preventDefault();
+      setButtonState(k, true);
+    }, { passive: false });
+
+    btn.addEventListener('touchend', e => {
+      e.preventDefault();
+      setButtonState(k, false);
+    }, { passive: false });
+
+    btn.addEventListener('touchcancel', () => {
+      setButtonState(k, false);
+    });
+
+    btn.addEventListener('mousedown', e => {
+      e.preventDefault();
+      setButtonState(k, true);
+    });
+    btn.addEventListener('mouseup', () => setButtonState(k, false));
+    btn.addEventListener('mouseleave', () => setButtonState(k, false));
+  });
+}
+
+// OPACITY CYCLE CONTROLLER
+const OPACITY_STEPS = [
+  { val: 1.0,  label: 'PAD: 100%' },
+  { val: 0.75, label: 'PAD: 75%' },
+  { val: 0.40, label: 'PAD: 40%' },
+  { val: 0.15, label: 'PAD: 15%' },
+  { val: 0.0,  label: 'PAD: OFF' }
+];
+let opacityIndex = 0;
+
+function cycleControllerOpacity() {
+  opacityIndex = (opacityIndex + 1) % OPACITY_STEPS.length;
+  const step = OPACITY_STEPS[opacityIndex];
+  const ctrl = document.getElementById('virtual-controller');
+  const btn = document.getElementById('btn-toggle-ctrl');
+  if (ctrl) {
+    if (step.val === 0) {
+      ctrl.style.display = 'none';
+    } else {
+      ctrl.style.display = 'block';
+      ctrl.style.opacity = step.val;
+    }
+  }
+  if (btn) {
+    btn.textContent = '🎮 ' + step.label;
+  }
+}
+
+// ═══════════════════════════════════════════════
+// LOADER & EMULATOR LIFECYCLE
+// ═══════════════════════════════════════════════
+function showLoader(gameTitle) {
+  const loader = document.getElementById('arcade-loader');
+  if (!loader) return;
+  loader.style.display = 'flex';
+  loader.style.opacity = '1';
+  document.getElementById('loader-title').textContent = 'LOADING ' + gameTitle;
+  document.getElementById('loader-status').textContent = 'Extracting injected ROM data...';
+  document.getElementById('loader-bar-fill').style.width = '25%';
+  document.getElementById('loader-error-box').style.display = 'none';
+  document.getElementById('loader-note').style.display = 'block';
+
+  let checkCount = 0;
+  if (checkRenderInterval) clearInterval(checkRenderInterval);
+
+  checkRenderInterval = setInterval(() => {
+    checkCount++;
+    const canvas = document.querySelector('canvas');
+
+    if (checkCount === 3) {
+      document.getElementById('loader-status').textContent = 'Starting emulator engine...';
+      document.getElementById('loader-bar-fill').style.width = '60%';
+    } else if (checkCount === 7) {
+      document.getElementById('loader-status').textContent = 'Launching video & sound...';
+      document.getElementById('loader-bar-fill').style.width = '85%';
+    }
+
+    if (canvas && window.EJS_emulator) {
+      if (window.EJS_emulator.paused) {
+        try { window.EJS_emulator.play(); } catch(e) {}
+      }
+
+      if (checkCount > 4 || (window.EJS_emulator.gameManager && window.EJS_emulator.gameManager.status === 1)) {
+        document.getElementById('loader-bar-fill').style.width = '100%';
+        setTimeout(hideLoader, 300);
+        clearInterval(checkRenderInterval);
+        return;
+      }
+    }
+
+    // Safety timeout: auto-hide after 12s so it never freezes
+    if (checkCount > 24) {
+      clearInterval(checkRenderInterval);
+      hideLoader();
+    }
+  }, 500);
+}
+
+function hideLoader() {
+  const loader = document.getElementById('arcade-loader');
+  if (loader) {
+    loader.style.opacity = '0';
+    setTimeout(() => { loader.style.display = 'none'; }, 300);
+  }
+}
+
+function retryCurrentGame() {
+  if (lastBootedGame) {
+    bootInjectedGame(lastBootedGame);
+  }
+}
+
+async function bootInjectedGame(gameKey) {
+  const cfg = GAME_CONFIGS[gameKey];
+  if (!cfg) return;
+
+  lastBootedGame = gameKey;
+
+  document.getElementById('arcade-menu').style.display = 'none';
+  document.getElementById('emu-screen').classList.add('active');
+  document.getElementById('emu-title').textContent = '🕹️ TUSHAR ARCADE ► ' + cfg.title;
+
+  const ctrl = document.getElementById('virtual-controller');
+  if (ctrl) {
+    ctrl.style.display = dpadVisible ? 'block' : 'none';
+    if (dpadVisible) ctrl.style.opacity = OPACITY_STEPS[opacityIndex].val;
+  }
+
+  const legend = document.getElementById('keyboard-legend');
+  if (legend) {
+    legend.style.display = dpadVisible ? 'none' : 'flex';
+  }
+
+  showLoader(cfg.title);
+
+  // 1. Check persistent IndexedDB cache (Instant 0ms)
+  const cachedBlob = await getCachedRom(gameKey);
+  if (cachedBlob) {
+    document.getElementById('loader-bar-fill').style.width = '65%';
+    document.getElementById('loader-status').textContent = 'Instant loading from local cache...';
+    if (currentBlobUrl) URL.revokeObjectURL(currentBlobUrl);
+    currentBlobUrl = URL.createObjectURL(cachedBlob);
+    startEmulator(currentBlobUrl, cfg.core);
+    return;
+  }
+
+  // 2. High-speed streaming fetch
+  try {
+    document.getElementById('loader-status').textContent = 'Fetching ROM...';
+    document.getElementById('loader-bar-fill').style.width = '20%';
+
+    const response = await fetch(encodeURI(cfg.romUrl));
+    if (!response.ok) throw new Error('HTTP ' + response.status + ' ' + response.statusText);
+
+    const contentLength = response.headers.get('content-length');
+    const totalBytes = contentLength ? parseInt(contentLength, 10) : 0;
+    let blob;
+
+    if (response.body && totalBytes > 0) {
+      const reader = response.body.getReader();
+      const chunks = [];
+      let receivedBytes = 0;
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        chunks.push(value);
+        receivedBytes += value.length;
+        const pct = Math.min(95, Math.round((receivedBytes / totalBytes) * 75) + 20);
+        document.getElementById('loader-bar-fill').style.width = pct + '%';
+        const mbRecv = (receivedBytes / (1024 * 1024)).toFixed(1);
+        const mbTot = (totalBytes / (1024 * 1024)).toFixed(1);
+        document.getElementById('loader-status').textContent = 'Loading: ' + mbRecv + 'MB / ' + mbTot + 'MB (' + pct + '%)';
+      }
+      blob = new Blob(chunks);
+    } else {
+      blob = await response.blob();
+    }
+
+    saveCachedRom(gameKey, blob);
+
+    document.getElementById('loader-bar-fill').style.width = '95%';
+    document.getElementById('loader-status').textContent = 'Launching WebAssembly engine...';
+    if (currentBlobUrl) URL.revokeObjectURL(currentBlobUrl);
+    currentBlobUrl = URL.createObjectURL(blob);
+    startEmulator(currentBlobUrl, cfg.core);
+
+  } catch(err) {
+    console.warn('Direct fetch failed:', err);
+    showFileCorsFallback(gameKey, cfg, err.message);
+  }
+}
+
+function showFileCorsFallback(gameKey, cfg, errorMsg) {
+  const isFileProto = window.location.protocol === 'file:';
+  document.getElementById('loader-note').style.display = 'none';
+  const errBox = document.getElementById('loader-error-box');
+  errBox.style.display = 'block';
+
+  if (isFileProto) {
+    errBox.innerHTML = `
+      <div class="loader-err-msg" style="color:var(--neon-yellow);line-height:1.7;">
+        ⚡ <strong>LOCAL BROWSER SECURITY (file://)</strong><br>
+        Modern browsers restrict background folder reading on local files.<br><br>
+        <strong>2 Instant Solutions:</strong><br>
+        1. <strong>Play Right Now:</strong> Double-click <code>Play-Arcade.bat</code> in the retro-arcade-web folder.<br>
+        2. <strong>Or Tap Below:</strong> Switch to local server or select <em>${cfg.filename}</em> from <code>roms/</code>:
+      </div>
+      <button class="loader-retry-btn" style="background:var(--neon-green);color:#000;font-weight:bold;margin-top:8px;" onclick="window.location.href='http://localhost:8088/index.html'">🚀 OPEN LOCAL SERVER (PORT 8088)</button>
+      <button class="loader-retry-btn" style="background:var(--neon-blue);color:#000;font-weight:bold;margin-top:8px;margin-left:6px;" onclick="promptRomFileForGame('${gameKey}')">📂 SELECT ${cfg.filename}</button>
+      <button class="loader-retry-btn" style="background:#555;margin-left:6px;" onclick="exitEmulator()">⬅ MENU</button>
+    `;
+  } else {
+    document.getElementById('loader-err-text').textContent = 'Error loading game: ' + errorMsg;
+  }
+}
+
+function promptRomFileForGame(gameKey) {
+  const input = document.getElementById('hidden-file-input');
+  input.onchange = async (e) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    const file = files[0];
+    const cfg = GAME_CONFIGS[gameKey];
+    if (currentBlobUrl) URL.revokeObjectURL(currentBlobUrl);
+    currentBlobUrl = URL.createObjectURL(file);
+    saveCachedRom(gameKey, file);
+    document.getElementById('loader-error-box').style.display = 'none';
+    document.getElementById('loader-status').textContent = 'Starting engine...';
+    startEmulator(currentBlobUrl, cfg.core);
+  };
+  input.click();
+}
+
+// Auto-redirect from file:// to localhost:8088 if local arcade server is running
+if (window.location.protocol === 'file:') {
+  fetch('http://localhost:8088/index.html', { method: 'HEAD', mode: 'no-cors' })
+    .then(() => {
+      window.location.replace('http://localhost:8088/index.html');
+    })
+    .catch(() => {});
+}
+
+function exportRom(gameKey, filename) {
+  const cfg = GAME_CONFIGS[gameKey];
+  if (!cfg) return;
+  const b64 = INJECTED_ROMS[cfg.romKey];
+  if (!b64) return alert('ROM data not found!');
+  const blob = b64toBlob(b64);
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+// START EMULATOR
+function startEmulator(gameUrl, core) {
+  const container = document.getElementById('game-target');
+  container.innerHTML = '';
+
+  window.EJS_player = '#game-target';
+  window.EJS_core = core;
+  window.EJS_gameUrl = gameUrl;
+  window.EJS_pathtodata = 'https://cdn.emulatorjs.org/stable/data/';
+  window.EJS_startOnLoaded = true;
+  window.EJS_backgroundColor = '#000000';
+  window.EJS_color = '#00ff41';
+  window.EJS_Buttons = {
+    playPause: true,
+    restart: true,
+    mute: true,
+    settings: true,
+    fullscreen: true,
+    saveState: true,
+    loadState: true,
+    gamepad: true,
+    cheat: true,
+    volume: true,
+    quickSave: true,
+    quickLoad: true
+  };
+  window.EJS_gamepadSupport = true;
+  window.EJS_mobileOptimization = false;
+  window.EJS_virtualGamepad = false;
+  window.EJS_CacheLimit = 1000 * 1024 * 1024;
+  window.EJS_defaultOptions = { 'save-state-slot': '1' };
+
+  initDpadTracking();
+  initActionButtons();
+  initAuxButtons();
+  setTimeout(cacheInputGeometry, 80);
+
+  let checkCount = 0;
+  if (checkRenderInterval) clearInterval(checkRenderInterval);
+  checkRenderInterval = setInterval(() => {
+    checkCount++;
+    const canvas = document.querySelector('canvas.ejs_canvas') || document.querySelector('canvas');
+    if (canvas) {
+      if (window.EJS_emulator && window.EJS_emulator.paused) {
+        try { window.EJS_emulator.play(); } catch(e) {}
+      }
+      document.getElementById('loader-bar-fill').style.width = '100%';
+      document.getElementById('loader-status').textContent = 'Game Ready!';
+      setTimeout(hideLoader, 150);
+      clearInterval(checkRenderInterval);
+      return;
+    }
+    if (checkCount > 25) {
+      clearInterval(checkRenderInterval);
+      hideLoader();
+    }
+  }, 100);
+
+  const oldScript = document.getElementById('ejs-loader');
+  if (oldScript) oldScript.remove();
+
+  const script = document.createElement('script');
+  script.id = 'ejs-loader';
+  script.src = 'https://cdn.emulatorjs.org/stable/data/loader.js';
+  script.onerror = () => {
+    document.getElementById('loader-status').textContent = 'Failed to load emulator core.';
+    document.getElementById('loader-note').style.display = 'none';
+    document.getElementById('loader-error-box').style.display = 'block';
+    document.getElementById('loader-err-text').textContent =
+      'Connection error: Unable to load emulator engine from CDN. Please check your internet connection.';
+  };
+  document.body.appendChild(script);
+
+  try {
+    window.dispatchEvent(new Event('gamepadconnected'));
+  } catch(e) {}
+};
+
+// Click to unpause handler on game canvas container
+document.getElementById('game-container').addEventListener('click', () => {
+  if (window.EJS_emulator && window.EJS_emulator.paused) {
+    try { window.EJS_emulator.play(); } catch(e) {}
+  }
+});
+
+function triggerFilePicker() {
+  document.getElementById('hidden-file-input').click();
+}
+
+function handleFileSelect(files) {
+  if (!files || files.length === 0) return;
+  const file = files[0];
+  const url = URL.createObjectURL(file);
+  const name = file.name.toLowerCase();
+
+  let core = 'snes';
+  if (name.endsWith('.nds')) core = 'nds';
+  else if (name.endsWith('.nes')) core = 'nes';
+  else if (name.endsWith('.gba')) core = 'gba';
+  else if (name.endsWith('.gb') || name.endsWith('.gbc')) core = 'gb';
+  else if (name.endsWith('.bin') || name.endsWith('.gen') || name.endsWith('.md')) core = 'segaMD';
+
+  document.getElementById('arcade-menu').style.display = 'none';
+  document.getElementById('emu-screen').classList.add('active');
+  document.getElementById('emu-title').textContent = file.name.toUpperCase();
+
+  const ctrl = document.getElementById('virtual-controller');
+  if (ctrl) {
+    ctrl.style.display = 'block';
+    ctrl.style.opacity = '1';
+  }
+
+  showLoader(file.name.toUpperCase());
+  startEmulator(url, core);
+}
+
+function exitEmulator() {
+  if (checkRenderInterval) clearInterval(checkRenderInterval);
+  hideLoader();
+  if (window.EJS_emulator && window.EJS_emulator.pause) {
+    try { window.EJS_emulator.pause(); } catch(e) {}
+  }
+  const container = document.getElementById('game-target');
+  container.innerHTML = '';
+
+  const emuScreen = document.getElementById('emu-screen');
+  emuScreen.classList.remove('active');
+  emuScreen.classList.remove('force-landscape');
+  isLandscapeForced = false;
+
+  const legend = document.getElementById('keyboard-legend');
+  if (legend) legend.style.display = 'none';
+
+  document.getElementById('arcade-menu').style.display = 'flex';
+}
+
+function toggleFullscreen() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().catch(() => {});
+  } else {
+    document.exitFullscreen().catch(() => {});
+  }
+}
+
+// Auto-unlock audio on first user touch / click
+window.addEventListener('touchstart', function unlockAudio() {
+  if (window.AudioContext || window.webkitAudioContext) {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      if (ctx.state === 'suspended') ctx.resume();
+    } catch(e) {}
+  }
+  window.removeEventListener('touchstart', unlockAudio);
+}, { once: true });
+
+document.addEventListener('contextmenu', e => e.preventDefault());
+console.log('%c🕹️ 100% STANDALONE TUSHAR ARCADE READY (SINGLE CONTROLLER + REAL BOX ART + ZERO LAG)!', 'color:#ffdd00;font-size:16px;font-weight:bold');
+</script>
+</body>
+</html>

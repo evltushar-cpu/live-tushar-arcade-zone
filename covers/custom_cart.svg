@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 250" width="200" height="250">
+  <defs>
+    <linearGradient id="cGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#161630"/>
+      <stop offset="50%" stop-color="#0c0c20"/>
+      <stop offset="100%" stop-color="#04040e"/>
+    </linearGradient>
+    <linearGradient id="lGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00d4ff"/>
+      <stop offset="100%" stop-color="#9900ee"/>
+    </linearGradient>
+    <linearGradient id="goldPins" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ffaa00"/>
+      <stop offset="50%" stop-color="#ffee55"/>
+      <stop offset="100%" stop-color="#ffaa00"/>
+    </linearGradient>
+  </defs>
+  <rect x="16" y="16" width="168" height="216" rx="12" fill="url(#cGrad)" stroke="#00d4ff" stroke-width="2"/>
+  <line x1="36" y1="32" x2="164" y2="32" stroke="#00d4ff" stroke-width="2" opacity="0.45"/>
+  <line x1="36" y1="40" x2="164" y2="40" stroke="#00d4ff" stroke-width="2" opacity="0.45"/>
+  <line x1="36" y1="48" x2="164" y2="48" stroke="#00d4ff" stroke-width="2" opacity="0.45"/>
+  <rect x="28" y="64" width="144" height="126" rx="6" fill="url(#lGrad)" stroke="#ffffff" stroke-width="1.5"/>
+  <rect x="33" y="69" width="134" height="116" rx="5" fill="#080816"/>
+  <path d="M68 98 L92 98 L102 108 L132 108 A 4 4 0 0 1 136 112 L136 144 A 4 4 0 0 1 132 148 L68 148 A 4 4 0 0 1 64 144 L64 102 A 4 4 0 0 1 68 98 Z" fill="none" stroke="#00d4ff" stroke-width="3"/>
+  <text x="100" y="165" font-family="'Courier New', monospace" font-size="9" font-weight="bold" fill="#00d4ff" text-anchor="middle" letter-spacing="1">CUSTOM ROM</text>
+  <rect x="40" y="222" width="120" height="12" rx="2" fill="#111" stroke="#333" stroke-width="1"/>
+  <rect x="48" y="225" width="104" height="6" fill="url(#goldPins)"/>
+</svg>
