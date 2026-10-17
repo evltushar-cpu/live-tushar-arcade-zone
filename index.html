@@ -462,6 +462,48 @@ html, body {
   color: var(--neon-yellow);
   background: rgba(255,255,0,0.15);
 }
+.emu-ping-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(4px, 1.1vw, 6px);
+  padding: 5px 8px;
+  border-radius: 4px;
+  background: rgba(0, 255, 65, 0.12);
+  border: 1px solid var(--neon-green);
+  color: var(--neon-green);
+  box-shadow: 0 0 8px rgba(0, 255, 65, 0.3);
+  white-space: nowrap;
+  letter-spacing: 0.5px;
+  user-select: none;
+}
+.emu-ping-pill .ping-dot {
+  font-size: 7px;
+  display: inline-block;
+  animation: pingPulse 1.2s infinite ease-in-out;
+}
+@keyframes pingPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.35; transform: scale(0.85); }
+}
+.emu-ping-pill.fast {
+  border-color: var(--neon-green);
+  color: var(--neon-green);
+  box-shadow: 0 0 8px rgba(0, 255, 65, 0.4);
+}
+.emu-ping-pill.medium {
+  border-color: var(--neon-yellow);
+  color: var(--neon-yellow);
+  background: rgba(255, 255, 0, 0.15);
+  box-shadow: 0 0 8px rgba(255, 255, 0, 0.4);
+}
+.emu-ping-pill.high {
+  border-color: var(--neon-pink);
+  color: var(--neon-pink);
+  background: rgba(255, 0, 144, 0.15);
+  box-shadow: 0 0 8px rgba(255, 0, 144, 0.4);
+}
 .topbar-btn.mode-toggle {
   border-color: var(--neon-green);
   color: var(--neon-green);
@@ -1023,7 +1065,7 @@ canvas.ejs_canvas {
   <div class="games-grid">
 
     <!-- GAME 1: ALADDIN (SNES) -->
-    <div class="game-card aladdin" onclick="bootInjectedGame('aladdin')">
+    <div class="game-card aladdin" onclick="launchGame('aladdin')">
       <div class="card-cover-wrap">
         <img class="game-cover-art" src="covers/aladdin_thumb.jpg" alt="Disney's Aladdin SNES Cover" />
         <span class="cover-badge gold">SNES</span>
@@ -1034,7 +1076,7 @@ canvas.ejs_canvas {
     </div>
 
     <!-- GAME 2: ULTIMATE MORTAL KOMBAT 3 (SNES) -->
-    <div class="game-card umk3" onclick="bootInjectedGame('umk3')">
+    <div class="game-card umk3" onclick="launchGame('umk3')">
       <div class="card-cover-wrap">
         <img class="game-cover-art" src="covers/umk3_thumb.jpg" alt="Ultimate Mortal Kombat 3 Cover" />
         <span class="cover-badge purple">SNES</span>
@@ -1045,7 +1087,7 @@ canvas.ejs_canvas {
     </div>
 
     <!-- GAME 3: STREET FIGHTER (SNES) -->
-    <div class="game-card sf5" onclick="bootInjectedGame('sf5')">
+    <div class="game-card sf5" onclick="launchGame('sf5')">
       <div class="card-cover-wrap">
         <img class="game-cover-art" src="covers/sf5_thumb.jpg" alt="Street Fighter SNES Cover" />
         <span class="cover-badge red">SNES</span>
@@ -1056,7 +1098,7 @@ canvas.ejs_canvas {
     </div>
 
     <!-- GAME 4: CONTRA 4 (NDS) -->
-    <div class="game-card contra4" onclick="bootInjectedGame('contra4')">
+    <div class="game-card contra4" onclick="launchGame('contra4')">
       <div class="card-cover-wrap">
         <img class="game-cover-art" src="covers/contra4_thumb.jpg" alt="Contra 4 NDS Cover" />
         <span class="cover-badge teal">NDS</span>
@@ -1067,7 +1109,7 @@ canvas.ejs_canvas {
     </div>
 
     <!-- GAME 5: CONTRA FORCE (NES) -->
-    <div class="game-card contra-force" onclick="bootInjectedGame('contra-force')">
+    <div class="game-card contra-force" onclick="launchGame('contra-force')">
       <div class="card-cover-wrap">
         <img class="game-cover-art" src="covers/contraForce_thumb.jpg" alt="Contra Force NES Cover" />
         <span class="cover-badge yellow">NES</span>
@@ -1078,7 +1120,7 @@ canvas.ejs_canvas {
     </div>
 
     <!-- GAME 6: NEW SUPER MARIO BROS (NDS) -->
-    <div class="game-card mario-nds" onclick="bootInjectedGame('mario-nds')">
+    <div class="game-card mario-nds" onclick="launchGame('mario-nds')">
       <div class="card-cover-wrap">
         <img class="game-cover-art" src="covers/marioNds_thumb.jpg" alt="New Super Mario Bros NDS Cover" />
         <span class="cover-badge red">NDS</span>
@@ -1089,7 +1131,7 @@ canvas.ejs_canvas {
     </div>
 
     <!-- GAME 7: SUPER MARIO BROS (CLASSIC 1:1) -->
-    <div class="game-card mario-classic" onclick="bootInjectedGame('mario-classic')">
+    <div class="game-card mario-classic" onclick="launchGame('mario-classic')">
       <div class="card-cover-wrap">
         <img class="game-cover-art" src="covers/marioClassic_thumb.jpg" alt="Super Mario Bros NES Cover" />
         <span class="cover-badge orange">CLASSIC</span>
@@ -1104,13 +1146,13 @@ canvas.ejs_canvas {
   <input type="file" id="hidden-file-input" accept=".zip,.sfc,.smc,.nes,.bin,.gba,.gb,.gbc,.nds,.gen,.md" onchange="handleFileSelect(this.files)">
 
   <div class="action-bar">
-    <button class="arcade-btn" onclick="exportRom('aladdin', 'Aladdin (USA).sfc')">💾 ALADDIN</button>
-    <button class="arcade-btn" onclick="exportRom('umk3', 'Ultimate Mortal Kombat 3.sfc')">💾 UMK3</button>
-    <button class="arcade-btn" onclick="exportRom('sf5', 'Street Fighter.smc')">💾 STREET FIGHTER</button>
-    <button class="arcade-btn" onclick="exportRom('contra4', 'Contra 4.nds')">💾 CONTRA 4</button>
-    <button class="arcade-btn" onclick="exportRom('contra-force', 'Contra Force.nes')">💾 CONTRA FORCE</button>
-    <button class="arcade-btn" onclick="exportRom('mario-classic', 'Super Mario Bros.bin')">💾 SMB CLASSIC</button>
-    <button class="arcade-btn" onclick="exportRom('mario-nds', 'New Super Mario Bros.nds')">💾 MARIO NDS</button>
+    <button class="arcade-btn" onclick="launchGame('aladdin')">▶ ALADDIN</button>
+    <button class="arcade-btn" onclick="launchGame('umk3')">▶ UMK3</button>
+    <button class="arcade-btn" onclick="launchGame('sf5')">▶ STREET FIGHTER</button>
+    <button class="arcade-btn" onclick="launchGame('contra4')">▶ CONTRA 4</button>
+    <button class="arcade-btn" onclick="launchGame('contra-force')">▶ CONTRA FORCE</button>
+    <button class="arcade-btn" onclick="launchGame('mario-classic')">▶ SMB CLASSIC</button>
+    <button class="arcade-btn" onclick="launchGame('mario-nds')">▶ MARIO NDS</button>
   </div>
 
   <!-- OWNER PANEL -->
@@ -1143,6 +1185,10 @@ canvas.ejs_canvas {
   <div id="emu-topbar">
     <div class="emu-title-text" id="emu-title">🎮 LOADING GAME...</div>
     <div class="topbar-actions">
+      <div id="emu-ping-badge" class="emu-ping-pill" title="Live Network Ping">
+        <span class="ping-dot">●</span>
+        <span id="ping-val">PING: ...</span>
+      </div>
       <button class="topbar-btn orient-toggle" id="btn-orient" onclick="toggleLandscape()">🔄 LANDSCAPE</button>
       <button class="topbar-btn mode-toggle" id="btn-toggle-dpad" onclick="toggleDpadVisibility()">📱 D-PAD: ON</button>
       <button class="topbar-btn pos-toggle" id="btn-toggle-pos" onclick="cycleControllerPosition()">🕹️ POS: HANDY</button>
@@ -2028,6 +2074,70 @@ function retryCurrentGame() {
   }
 }
 
+// ═══════════════════════════════════════════════
+// LIVE NETWORK PING MONITOR (IN-GAME HUD)
+// ═══════════════════════════════════════════════
+let pingInterval = null;
+
+async function measurePing() {
+  const badge = document.getElementById('emu-ping-badge');
+  const pingVal = document.getElementById('ping-val');
+  if (!badge || !pingVal) return;
+
+  const t0 = performance.now();
+  try {
+    const pingTarget = (window.location.origin && window.location.origin.startsWith('http'))
+      ? window.location.origin + window.location.pathname + '?_ping=' + Date.now()
+      : 'https://cdn.emulatorjs.org/favicon.ico?_ping=' + Date.now();
+
+    await fetch(pingTarget, { method: 'HEAD', cache: 'no-store' });
+    const rtt = Math.round(performance.now() - t0);
+
+    pingVal.textContent = 'PING: ' + rtt + 'ms';
+    badge.className = 'emu-ping-pill ' + (rtt < 60 ? 'fast' : rtt < 130 ? 'medium' : 'high');
+  } catch(e) {
+    const rtt = Math.round(performance.now() - t0);
+    pingVal.textContent = 'PING: ' + (rtt > 0 ? rtt + 'ms' : '0ms (Wasm)');
+    badge.className = 'emu-ping-pill fast';
+  }
+}
+
+function startPingMonitor() {
+  if (pingInterval) clearInterval(pingInterval);
+  measurePing();
+  pingInterval = setInterval(measurePing, 2500);
+}
+
+function stopPingMonitor() {
+  if (pingInterval) {
+    clearInterval(pingInterval);
+    pingInterval = null;
+  }
+}
+
+// ═══════════════════════════════════════════════
+// CLEAN URL ROUTER & SINGLE-SESSION ENGINE
+// ═══════════════════════════════════════════════
+function launchGame(gameKey) {
+  triggerHaptic('start');
+  playButtonSound('start');
+  if (window.location.protocol === 'file:') {
+    bootInjectedGame(gameKey);
+    return;
+  }
+  const url = new URL(window.location.href);
+  url.searchParams.set('play', gameKey);
+  window.location.href = url.toString();
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  const params = new URLSearchParams(window.location.search);
+  const playTarget = params.get('play');
+  if (playTarget && GAME_CONFIGS[playTarget]) {
+    bootInjectedGame(playTarget);
+  }
+});
+
 async function bootInjectedGame(gameKey) {
   const cfg = GAME_CONFIGS[gameKey];
   if (!cfg) return;
@@ -2037,6 +2147,8 @@ async function bootInjectedGame(gameKey) {
   document.getElementById('arcade-menu').style.display = 'none';
   document.getElementById('emu-screen').classList.add('active');
   document.getElementById('emu-title').textContent = '🕹️ TUSHAR ARCADE ► ' + cfg.title;
+
+  startPingMonitor();
 
   const ctrl = document.getElementById('virtual-controller');
   if (ctrl) {
@@ -2158,19 +2270,7 @@ if (window.location.protocol === 'file:') {
     .catch(() => {});
 }
 
-function exportRom(gameKey, filename) {
-  const cfg = GAME_CONFIGS[gameKey];
-  if (!cfg) return;
-  const b64 = INJECTED_ROMS[cfg.romKey];
-  if (!b64) return alert('ROM data not found!');
-  const blob = b64toBlob(b64);
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-}
+// exportRom deprecated in live web arcade
 
 // START EMULATOR
 function startEmulator(gameUrl, core) {
@@ -2289,23 +2389,32 @@ function handleFileSelect(files) {
 }
 
 function exitEmulator() {
+  stopPingMonitor();
   if (checkRenderInterval) clearInterval(checkRenderInterval);
   hideLoader();
   if (window.EJS_emulator && window.EJS_emulator.pause) {
     try { window.EJS_emulator.pause(); } catch(e) {}
   }
+  const params = new URLSearchParams(window.location.search);
+  if (params.has('play') && window.location.protocol !== 'file:') {
+    window.location.href = window.location.origin + window.location.pathname;
+    return;
+  }
   const container = document.getElementById('game-target');
-  container.innerHTML = '';
+  if (container) container.innerHTML = '';
 
   const emuScreen = document.getElementById('emu-screen');
-  emuScreen.classList.remove('active');
-  emuScreen.classList.remove('force-landscape');
+  if (emuScreen) {
+    emuScreen.classList.remove('active');
+    emuScreen.classList.remove('force-landscape');
+  }
   isLandscapeForced = false;
 
   const legend = document.getElementById('keyboard-legend');
   if (legend) legend.style.display = 'none';
 
-  document.getElementById('arcade-menu').style.display = 'flex';
+  const menu = document.getElementById('arcade-menu');
+  if (menu) menu.style.display = 'flex';
 }
 
 function toggleFullscreen() {
